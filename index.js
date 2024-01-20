@@ -18,19 +18,26 @@ const setGame = () => {
     const gravity = .7;
     
     class Sprite {
-        constructor({ position, velocity, color = 'red' }) {
+        constructor({ position, velocity, color = 'red', offset }) {
             this.position = position;
             this.velocity = velocity;
             this.width = 50;
             this.height = 150;
             this.lastKey;
+
             this.attackBox = {
-                position: this.position,
+                position: {
+                    x: this.position.x,
+                    y: this.position.y
+                },
+                offset,
                 width: 100,
                 height: 50
             }
+
             this.color = color;
             this.isAttacking;
+            
         }
 
         draw() {
@@ -38,16 +45,22 @@ const setGame = () => {
             c.fillRect(this.position.x, this.position.y, this.width, this.height);
 
             // Attck Box
-            c.fillStyle ='green';
-            c.fillRect(this.attackBox.position.x, 
-                this.attackBox.position.y, 
-                this.attackBox.width, this.attackBox.height);
-
+            //if(this.isAttacking)
+            {
+                c.fillStyle ='green';
+                c.fillRect(
+                    this.attackBox.position.x, 
+                    this.attackBox.position.y, 
+                    this.attackBox.width, this.attackBox.height);
+    
+            }
+           
         }
 
         update() {
             this.draw();
-            
+            this.attackBox.position.x = this.position.x + this.attackBox.offset.x;
+            this.attackBox.position.y = this.position.y;
             this.position.x += this.velocity.x;
             this.position.y += this.velocity.y;
 
@@ -76,6 +89,11 @@ const setGame = () => {
         velocity: {
             x: 0,
             y: 0
+        },
+
+        offset: {
+            x: 0,
+            y: 0
         }
 
     });
@@ -88,6 +106,11 @@ const setGame = () => {
 
         velocity: {
             x: 0,
+            y: 0
+        },
+
+        offset: {
+            x: -50,
             y: 0
         },
 
@@ -113,6 +136,13 @@ const setGame = () => {
             pressed: false
         }
     };
+
+    const rectangularCollision = ({rectangle1, rectangle2}) => {
+        return (rectangle1.attackBox.position.x + rectangle1.attackBox.width >= rectangle2.position.x
+            && rectangle1.attackBox.position.x <= rectangle2.position.x + rectangle2.width
+            && rectangle1.attackBox.position.y + rectangle1.attackBox.height >= rectangle2.position.y
+            && rectangle1.attackBox.position.y <= rectangle2.position.y + rectangle2.height);
+    }
 
 
     const animate = () => {
@@ -140,15 +170,21 @@ const setGame = () => {
             enemy.velocity.x = 5;
         }
 
-        // Detect for Collision
-        if(player.attackBox.position.x + player.attackBox.width >= enemy.position.x
-            && player.attackBox.position.x <= enemy.position.x + enemy.width
-            && player.attackBox.position.y + player.attackBox.height >= enemy.position.y
-            && player.attackBox.position.y <= enemy.position.y + enemy.height
-            && player.isAttacking){
+        // Detect for Collision from Player
+        if(rectangularCollision ({rectangle1: player, rectangle2: enemy}) && player.isAttacking){
             
-                console.log('attack');
-        } 
+                enemy.isAttacking = false;
+                
+                console.log('player attack success');
+        }
+        
+        // Detect for Collision from Enemy
+        if(rectangularCollision ({rectangle1: enemy, rectangle2: player}) && enemy.isAttacking){
+            
+            enemy.isAttacking = false;
+            
+            console.log('enemy attack success');
+    }
     };
 
     animate();
@@ -174,7 +210,8 @@ const setGame = () => {
             case ' ':
                 player.attack();
                 break;
-
+            
+            // Enemy Keys
             case 'ArrowRight': 
                 keys.ArrowRight.pressed = true;
                 enemy.lastKey = 'ArrowRight';
@@ -188,9 +225,12 @@ const setGame = () => {
             case 'ArrowUp': 
                 enemy.velocity.y = -20;
                 break;
-        }
 
-        console.log(e.key);
+            case 'ArrowDown': 
+                enemy.isAttacking = true;
+                break;
+        }
+  
     }));
 
     window.addEventListener('keyup', ((e) => {
@@ -209,18 +249,15 @@ const setGame = () => {
             //Enemy Keys        
             case 'ArrowRight': 
                 keys.ArrowRight.pressed = false;
-                
                 break;
 
             case 'ArrowLeft': 
                 keys.ArrowLeft.pressed = false;
-                
                 break;
 
    
         }
 
-        console.log(e.key);
     }));
 
 };
