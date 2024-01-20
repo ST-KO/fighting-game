@@ -37,7 +37,7 @@ const setGame = () => {
 
             this.color = color;
             this.isAttacking;
-            
+            this.health = 100;
         }
 
         draw() {
@@ -45,7 +45,7 @@ const setGame = () => {
             c.fillRect(this.position.x, this.position.y, this.width, this.height);
 
             // Attck Box
-            //if(this.isAttacking)
+            if(this.isAttacking)
             {
                 c.fillStyle ='green';
                 c.fillRect(
@@ -173,17 +173,19 @@ const setGame = () => {
         // Detect for Collision from Player
         if(rectangularCollision ({rectangle1: player, rectangle2: enemy}) && player.isAttacking){
             
-                enemy.isAttacking = false;
-                
-                console.log('player attack success');
+                player.isAttacking = false;
+                enemy.health -= 20;
+          
+                document.querySelector('#enemyHealth').style.width = enemy.health + "%";
         }
         
         // Detect for Collision from Enemy
         if(rectangularCollision ({rectangle1: enemy, rectangle2: player}) && enemy.isAttacking){
             
             enemy.isAttacking = false;
-            
-            console.log('enemy attack success');
+            player.health -= 20;
+     
+            document.querySelector('#playerHealth').style.width = player.health + "%";
     }
     };
 
@@ -227,7 +229,7 @@ const setGame = () => {
                 break;
 
             case 'ArrowDown': 
-                enemy.isAttacking = true;
+                enemy.attack();
                 break;
         }
   
@@ -255,7 +257,6 @@ const setGame = () => {
                 keys.ArrowLeft.pressed = false;
                 break;
 
-   
         }
 
     }));
