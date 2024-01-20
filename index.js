@@ -144,6 +144,46 @@ const setGame = () => {
             && rectangle1.attackBox.position.y <= rectangle2.position.y + rectangle2.height);
     }
 
+    // End the game based on Timer
+    const determineWinner = ({player, enemy, timerId}) => {
+        
+        clearTimeout(timerId);
+        
+        document.getElementById('displayText').style.display = 'flex';
+
+        if(player.health === enemy.health){
+            document.getElementById('displayText').innerHTML = 'Tie';
+            
+        }
+
+        else if(player.health > enemy.health) {
+            document.getElementById('displayText').innerHTML = 'Player 1 Win';
+        }
+
+        else if(player.health < enemy.health) {
+            document.getElementById('displayText').innerHTML = 'Player 2 Win';
+        }
+    }
+    
+    let timer = 60;
+    let timerId;
+    const decreaseTimer = () => {
+        
+        if(timer > 0)
+        {
+            timerId = setTimeout(decreaseTimer, 1000);
+            timer--;
+            document.getElementById('timer').innerHTML = timer;
+        }
+
+        if(timer === 0){
+            
+            determineWinner({player, enemy, timerId});
+        }
+        
+    };
+
+    decreaseTimer();
 
     const animate = () => {
         
@@ -186,7 +226,12 @@ const setGame = () => {
             player.health -= 20;
      
             document.querySelector('#playerHealth').style.width = player.health + "%";
-    }
+        }
+
+        // End the game based on Health
+        if(enemy.health <=0 || player.health <= 0){
+            determineWinner({player, enemy, timerId});
+        }
     };
 
     animate();
