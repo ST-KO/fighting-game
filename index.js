@@ -1,3 +1,5 @@
+import { Sprite, Fighter } from "./js/classes.js";
+//import { rectangularCollision, determineWinner, decreaseTimer, timerId } from './js/utils.js';
 
 window.onload = ()=> {
     setGame();
@@ -16,71 +18,34 @@ const setGame = () => {
 
     // Create Player and Enemy
     const gravity = .7;
-    
-    class Sprite {
-        constructor({ position, velocity, color = 'red', offset }) {
-            this.position = position;
-            this.velocity = velocity;
-            this.width = 50;
-            this.height = 150;
-            this.lastKey;
 
-            this.attackBox = {
-                position: {
-                    x: this.position.x,
-                    y: this.position.y
-                },
-                offset,
-                width: 100,
-                height: 50
-            }
+    const background = new Sprite({
+        position: {
+            x: 0,
+            y:0
+        },
 
-            this.color = color;
-            this.isAttacking;
-            this.health = 100;
-        }
+        imageSrc1: './img/background/background_layer_1.png',
+        imageSrc2: './img/background/background_layer_2.png',
+        imageSrc3: './img/background/background_layer_3.png'
+    });
 
-        draw() {
-            c.fillStyle = this.color;
-            c.fillRect(this.position.x, this.position.y, this.width, this.height);
+    const shop = new Sprite({
+        position: {
+            x: 600,
+            y: 222
+        },
 
-            // Attck Box
-            if(this.isAttacking)
-            {
-                c.fillStyle ='green';
-                c.fillRect(
-                    this.attackBox.position.x, 
-                    this.attackBox.position.y, 
-                    this.attackBox.width, this.attackBox.height);
-    
-            }
-           
-        }
+        imageSrc1: './img/decorations/shop_anim.png',
+        imageSrc2: './img/decorations/shop_anim.png',
+        imageSrc3: './img/decorations/shop_anim.png',
 
-        update() {
-            this.draw();
-            this.attackBox.position.x = this.position.x + this.attackBox.offset.x;
-            this.attackBox.position.y = this.position.y;
-            this.position.x += this.velocity.x;
-            this.position.y += this.velocity.y;
+        scale: 2.75,
+        framesMax: 6
+  
+    });
 
-            if(this.position.y + this.height + this.velocity.y >= canvas.height){
-                this.velocity.y = 0;
-            }else {
-                this.velocity.y += gravity;
-            }
-        }
-
-        attack() {
-            this.isAttacking = true;
-
-            setTimeout(() => {
-                this.isAttacking = false;
-            }, 100);
-        }
-    }
-
-    const player = new Sprite({
+    const player = new Fighter({
         position: {
             x: 0,
             y: 0
@@ -98,7 +63,7 @@ const setGame = () => {
 
     });
 
-    const enemy = new Sprite({
+    const enemy = new Fighter({
         position: {
             x: 400,
             y: 100
@@ -143,23 +108,23 @@ const setGame = () => {
             && rectangle1.attackBox.position.y + rectangle1.attackBox.height >= rectangle2.position.y
             && rectangle1.attackBox.position.y <= rectangle2.position.y + rectangle2.height);
     }
-
+    
     // End the game based on Timer
     const determineWinner = ({player, enemy, timerId}) => {
         
         clearTimeout(timerId);
-        
+    
         document.getElementById('displayText').style.display = 'flex';
-
+    
         if(player.health === enemy.health){
             document.getElementById('displayText').innerHTML = 'Tie';
             
         }
-
+    
         else if(player.health > enemy.health) {
             document.getElementById('displayText').innerHTML = 'Player 1 Win';
         }
-
+    
         else if(player.health < enemy.health) {
             document.getElementById('displayText').innerHTML = 'Player 2 Win';
         }
@@ -175,7 +140,7 @@ const setGame = () => {
             timer--;
             document.getElementById('timer').innerHTML = timer;
         }
-
+    
         if(timer === 0){
             
             determineWinner({player, enemy, timerId});
@@ -183,13 +148,17 @@ const setGame = () => {
         
     };
 
-    decreaseTimer();
+    decreaseTimer(player, enemy);
 
     const animate = () => {
         
         window.requestAnimationFrame(animate);
         c.fillStyle = 'black';
         c.fillRect(0, 0, canvas.width, canvas.height);
+
+        background.update();
+        shop.update();
+
         player.update();
         enemy.update();
 
