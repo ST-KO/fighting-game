@@ -25,20 +25,17 @@ const setGame = () => {
             y:0
         },
 
-        imageSrc1: './img/background/background_layer_1.png',
-        imageSrc2: './img/background/background_layer_2.png',
-        imageSrc3: './img/background/background_layer_3.png'
+        imageSrc: './img/background/background.png',
+
     });
 
     const shop = new Sprite({
         position: {
             x: 600,
-            y: 222
+            y: 135
         },
 
-        imageSrc1: './img/decorations/shop_anim.png',
-        imageSrc2: './img/decorations/shop_anim.png',
-        imageSrc3: './img/decorations/shop_anim.png',
+        imageSrc: './img/decorations/shop_anim.png',
 
         scale: 2.75,
         framesMax: 6
@@ -46,6 +43,7 @@ const setGame = () => {
     });
 
     const player = new Fighter({
+        
         position: {
             x: 0,
             y: 0
@@ -59,6 +57,42 @@ const setGame = () => {
         offset: {
             x: 0,
             y: 0
+        },
+
+        imageSrc: './img/Martial Hero/Sprites/Idle.png',
+        
+        framesMax: 8,
+        scale: 2.5,
+        offset: {
+            x:  215,
+            y:  250
+        },
+        sprites: {
+            idle: {
+                imageSrc: './img/Martial Hero/Sprites/Idle.png',
+                framesMax: 8
+            },
+
+            run: {
+                imageSrc: './img/Martial Hero/Sprites/Run.png',
+                framesMax: 8
+            },
+
+            jump: {
+                imageSrc: './img/Martial Hero/Sprites/Jump.png',
+                framesMax: 2
+            },
+            
+            fall: {
+                imageSrc: './img/Martial Hero/Sprites/Fall.png',
+                framesMax: 2
+            },
+
+            attack1: {
+                imageSrc: './img/Martial Hero/Sprites/Attack1.png',
+                framesMax: 6
+            }
+            
         }
 
     });
@@ -79,7 +113,15 @@ const setGame = () => {
             y: 0
         },
 
-        color: 'blue'
+        color: 'blue',
+
+        imageSrc: './img/Martial Hero/Sprites/Idle.png',
+        framesMax: 8,
+        scale: 2.5,
+        offset: {
+            x:  215,
+            y:  250
+        }
 
     });
 
@@ -166,10 +208,23 @@ const setGame = () => {
         enemy.velocity.x = 0;
 
         // Player Movement
+    
         if(keys.a.pressed && player.lastKey === 'a'){
             player.velocity.x = -5;
+            player.switchSprite('run');
+    
         } else if(keys.d.pressed && player.lastKey === 'd'){
             player.velocity.x = 5;
+            player.switchSprite('run');
+
+        } else {
+            player.switchSprite('idle');
+        }
+
+        if(player.velocity.y < 0){
+            player.switchSprite('jump');
+        } else if (player.velocity.y > 0) {
+            player.switchSprite('fall');
         }
 
         // Enemy Movement
