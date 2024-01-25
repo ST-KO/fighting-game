@@ -93,6 +93,16 @@ const setGame = () => {
                 framesMax: 6
             }
             
+        },
+
+        attackBox: {
+            offset: {
+                x: 100,
+                y: -40
+            },
+
+            width: 160,
+            height: 40
         }
 
     });
@@ -115,13 +125,52 @@ const setGame = () => {
 
         color: 'blue',
 
-        imageSrc: './img/Martial Hero/Sprites/Idle.png',
-        framesMax: 8,
+        imageSrc: './img/kenji/Idle.png',
+        framesMax: 4,
         scale: 2.5,
         offset: {
             x:  215,
-            y:  250
+            y:  260
+        },
+
+        sprites: {
+            idle: {
+                imageSrc: './img/kenji/Idle.png',
+                framesMax: 4
+            },
+
+            run: {
+                imageSrc: './img/kenji/Run.png',
+                framesMax: 8
+            },
+
+            jump: {
+                imageSrc: './img/kenji/Jump.png',
+                framesMax: 2
+            },
+            
+            fall: {
+                imageSrc: './img/kenji/Fall.png',
+                framesMax: 2
+            },
+
+            attack1: {
+                imageSrc: './img/kenji/Attack1.png',
+                framesMax: 4
+            }
+            
+        },
+
+        attackBox: {
+            offset: {
+                x: 0,
+                y: 0
+            },
+
+            width: 100,
+            height: 50
         }
+
 
     });
 
@@ -208,7 +257,6 @@ const setGame = () => {
         enemy.velocity.x = 0;
 
         // Player Movement
-    
         if(keys.a.pressed && player.lastKey === 'a'){
             player.velocity.x = -5;
             player.switchSprite('run');
@@ -221,6 +269,7 @@ const setGame = () => {
             player.switchSprite('idle');
         }
 
+        // Player Jumping
         if(player.velocity.y < 0){
             player.switchSprite('jump');
         } else if (player.velocity.y > 0) {
@@ -230,17 +279,33 @@ const setGame = () => {
         // Enemy Movement
         if(keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft'){
             enemy.velocity.x = -5;
+            enemy.switchSprite('run');
+
         } else if(keys.ArrowRight.pressed && enemy.lastKey === 'ArrowRight'){
             enemy.velocity.x = 5;
+            enemy.switchSprite('run');
+        } else {
+            enemy.switchSprite('idle');
+        }
+
+        // Enemy Jumping
+        if(enemy.velocity.y < 0){
+            enemy.switchSprite('jump');
+        } else if (enemy.velocity.y > 0) {
+            enemy.switchSprite('fall');
         }
 
         // Detect for Collision from Player
-        if(rectangularCollision ({rectangle1: player, rectangle2: enemy}) && player.isAttacking){
+        if(rectangularCollision ({rectangle1: player, rectangle2: enemy}) && player.isAttacking
+        && player.framesCurrent === 4){
             
-                player.isAttacking = false;
                 enemy.health -= 20;
-          
                 document.querySelector('#enemyHealth').style.width = enemy.health + "%";
+        }
+
+        // if player misses
+        if(player.isAttacking && player.framesCurrent === 4){
+            player.isAttacking = false;
         }
         
         // Detect for Collision from Enemy
